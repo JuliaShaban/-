@@ -128,9 +128,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="newtonMethod.cpp" />
+    <ClCompile Include="Gauss.cpp" />
     <ClCompile Include="Метод Ньютона.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gauss.h" />
     <ClInclude Include="newtonMethod.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
