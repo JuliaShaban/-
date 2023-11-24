@@ -35,6 +35,31 @@ double maximum(double x1, double x2)
 {
     return abs((x1 > x2) ? x1 : x2);
 }
+vector<vector<double>> Jac1(double x1, double x2, int n)
+{
+    vector<double> x(n);
+    x[0] = x1;
+    x[1] = x2;
+    vector<vector<double>> jac(n, vector<double>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            if (i == 0) jac[i][j] = (j == 0) ? diffF1x1(x[0], x[1]) : diffF1x2(x[0],x[1]);
+            else jac[i][j] = (j == 0) ? diffF2x1(x[0], x[1]) : diffF2x2(x[0], x[1]);
+    return jac;
+}
+vector<vector<double>> Jac2(double x1, double x2, int n, double M)
+{
+    vector<double> x(n);
+    x[0] = x1;
+    x[1] = x2;
+    vector<vector<double>> jac(n, vector<double>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            if (i == 0) jac[i][j] = (j == 0) ? (f1(x[0] + M * x[0], x[1]) - f1(x[0], x[1])) / M * x[0] : (f1(x[0], x[1] + M * x[1]) - f1(x[0], x[1])) / M * x[1];
+            else jac[i][j] = (j == 0) ? (f2(x[0] + M * x[0], x[1]) - f2(x[0], x[1])) / M * x[0] : (f2(x[0], x[1] + M * x[1]) - f2(x[0], x[1])) / M * x[1];
+
+    return jac;
+}
 
 double maximum(vector<double>& x,vector<vector<double>>& matrix)
 {
@@ -50,7 +75,7 @@ double maximum(vector<double>& x,vector<vector<double>>& matrix)
             max = abs(matrix[i][n] / (x[i] + matrix[i][n]));
     return max;
 }
-void newtonMethod(double x1, double x2, int n, vector<vector<double>> Jac)
+void newtonMethod(double x1, double x2, int n, bool b, double M)
 {
     const int nit = 100;
     const double e1 = 1e-9, e2 = e1;
@@ -76,7 +101,11 @@ void newtonMethod(double x1, double x2, int n, vector<vector<double>> Jac)
         F[0] = -f1(x[0], x[1]);
         F[1] = -f2(x[0], x[1]);
         
-        jac = Jac;
+        if (b)
+        jac = Jac1(x[0],x[1],n);
+        else
+            jac = Jac2(x[0], x[1], n, M);
+
         for (int i = 0; i < n; i++)
         {
             for (int j = 0; j < n; j++)
@@ -94,30 +123,4 @@ void newtonMethod(double x1, double x2, int n, vector<vector<double>> Jac)
         k++;
     }
     cout << "\nAnswer: (" << x[0] << "; " << x[1] << ")";
-}
-
-vector<vector<double>> Jac(double x1, double x2, int n)
-{
-    vector<double> x(n);
-    x[0] = x1;
-    x[1] = x2;
-    vector<vector<double>> jac(n, vector<double>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            if (i == 0) jac[i][j] = (j == 0) ? diffF1x1(x[0], x[1]) : diffF1x2(x[0],x[1]);
-            else jac[i][j] = (j == 0) ? diffF2x1(x[0], x[1]) : diffF2x2(x[0], x[1]);
-    return jac;
-}
-vector<vector<double>> Jac(double x1, double x2, int n, double M)
-{
-    vector<double> x(n);
-    x[0] = x1;
-    x[1] = x2;
-    vector<vector<double>> jac(n, vector<double>(n));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
-            if (i == 0) jac[i][j] = (j == 0) ? (f1(x[0] + M * x[0], x[1]) - f1(x[0], x[1])) / M * x[0] : (f1(x[0], x[1] + M * x[1]) - f1(x[0], x[1])) / M * x[1];
-            else jac[i][j] = (j == 0) ? (f2(x[0] + M * x[0], x[1]) - f2(x[0], x[1])) / M * x[0] : (f2(x[0], x[1] + M * x[1]) - f2(x[0], x[1])) / M * x[1];
-
-    return jac;
 }
